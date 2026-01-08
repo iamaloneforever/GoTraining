@@ -8,6 +8,7 @@ import (
 
 	"github.com/google/uuid"
 	"github.com/iamaloneforever/GoTraining/db"
+	"github.com/iamaloneforever/GoTraining/db/auth"
 )
 
 func (apiConf *apiConfig) handleCreateUser(w http.ResponseWriter, r *http.Request) {
@@ -44,4 +45,21 @@ func (apiConf *apiConfig) handleCreateUser(w http.ResponseWriter, r *http.Reques
 
 	// فقط پیام موفقیت بده
 	respondWithJSON(w, http.StatusCreated, databaseUserToUser(user))
+}
+func (apiConf *apiConfig) handleGetUser(w http.ResponseWriter, r *http.Request) {
+	apikey, err := auth.GetAPIKey(r.Header)
+	if err != nil {
+		respondWithError(w, http.StatusForbidden,
+			fmt.Sprintf("Auth error: %v", err))
+		return
+	}
+
+	user, err := apiConf.DB.GetUserByAPIKey(r.Context(), apikey)
+	if err != nil {
+		respondWithError(w, http.StatusBadRequest,
+			fmt.Sprintf("Couldn't get user: %v", err))
+		return
+	}
+
+	respondWithJSON(w, http.StatusOK, databaseUserToUser(user))
 }

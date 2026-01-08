@@ -49,7 +49,7 @@ func main() {
 	v1Router := chi.NewRouter()
 	v1Router.Get("/ready", handleReadiness)
 	v1Router.Post("/users", apiCon.handleCreateUser)
-
+	v1Router.Get("/users", apiCon.handleGetUser)
 	router.Mount("/v1", v1Router)
 
 	log.Printf("Server starting on port %s", portString)
